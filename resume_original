@@ -1,0 +1,788 @@
+%-----------------------------------------------------------------------------------------------------------------------------------------------%
+%	The MIT License (MIT)
+%
+%	Copyright (c) 2019 Jan Küster
+%
+%	Permission is hereby granted, free of charge, to any person obtaining a copy
+%	of this software and associated documentation files (the "Software"), to deal
+%	in the Software without restriction, including without limitation the rights
+%	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+%	copies of the Software, and to permit persons to whom the Software is
+%	furnished to do so, subject to the following conditions:
+%	
+%	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+%	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+%	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+%	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+%	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+%	THE SOFTWARE.
+%	
+%
+%-----------------------------------------------------------------------------------------------------------------------------------------------%
+
+
+%============================================================================%
+%
+%	DOCUMENT DEFINITION
+%
+%============================================================================%
+
+%we use article class because we want to fully customize the page and don't use a cv template
+\documentclass[10pt,A4]{article}	
+
+
+%----------------------------------------------------------------------------------------
+%	ENCODING
+%----------------------------------------------------------------------------------------
+
+% we use utf8 since we want to build from any machine
+\usepackage[utf8]{inputenc}		
+
+%----------------------------------------------------------------------------------------
+%	LOGIC
+%----------------------------------------------------------------------------------------
+
+% provides \isempty test
+\usepackage{xstring, xifthen}
+\usepackage{enumitem}
+
+%----------------------------------------------------------------------------------------
+%	FONT BASICS
+%----------------------------------------------------------------------------------------
+
+% some tex-live fonts - choose your own
+
+%\usepackage[defaultsans]{droidsans}
+%\usepackage[default]{comfortaa}
+%\usepackage{cmbright}
+\usepackage[default]{raleway}
+%\usepackage{fetamont}
+%\usepackage[default]{gillius}
+%\usepackage[light,math]{iwona}
+%\usepackage[thin]{roboto} 
+
+% set font default
+\renewcommand*\familydefault{\sfdefault} 	
+\usepackage[T1]{fontenc}
+
+% more font size definitions
+\usepackage{moresize}
+
+%----------------------------------------------------------------------------------------
+%	FONT AWESOME ICONS
+%---------------------------------------------------------------------------------------- 
+
+% include the fontawesome icon set
+\usepackage{fontawesome}
+
+% use to vertically center content
+% credits to: http://tex.stackexchange.com/questions/7219/how-to-vertically-center-two-images-next-to-each-other
+\newcommand{\vcenteredinclude}[1]{\begingroup
+\setbox0=\hbox{\includegraphics{#1}}%
+\parbox{\wd0}{\box0}\endgroup}
+
+% use to vertically center content
+% credits to: http://tex.stackexchange.com/questions/7219/how-to-vertically-center-two-images-next-to-each-other
+\newcommand*{\vcenteredhbox}[1]{\begingroup
+\setbox0=\hbox{#1}\parbox{\wd0}{\box0}\endgroup}
+
+% icon shortcut
+\newcommand{\icon}[3] { 							
+	\makebox(#2, #2){\textcolor{maincol}{\csname fa#1\endcsname}}
+}	
+
+% icon with text shortcut
+\newcommand{\icontext}[4]{ 						
+	\vcenteredhbox{\icon{#1}{#2}{#3}}  \hspace{2pt}  \parbox{0.9\mpwidth}{\textcolor{#4}{#3}}
+}
+
+% icon with website url
+\newcommand{\iconhref}[5]{ 						
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{#4}{\textcolor{#5}{#3}}
+}
+
+% icon with email link
+\newcommand{\iconemail}[5]{ 						
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{mailto:#4}{\textcolor{#5}{#3}}
+}
+
+%----------------------------------------------------------------------------------------
+%	PAGE LAYOUT  DEFINITIONS
+%----------------------------------------------------------------------------------------
+
+% page outer frames (debug-only)
+% \usepackage{showframe}		
+
+% we use paracol to display breakable two columns
+\usepackage{paracol}
+
+% define page styles using geometry
+\usepackage[a4paper]{geometry}
+
+% remove all possible margins
+\geometry{top=1cm, bottom=1cm, left=1cm, right=1cm}
+
+\usepackage{fancyhdr}
+\pagestyle{empty}
+
+% space between header and content
+% \setlength{\headheight}{0pt}
+
+% indentation is zero
+\setlength{\parindent}{0mm}
+
+%----------------------------------------------------------------------------------------
+%	TABLE /ARRAY DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+
+% extended aligning of tabular cells
+\usepackage{array}
+
+% custom column right-align with fixed width
+% use like p{size} but via x{size}
+\newcolumntype{x}[1]{%
+>{\raggedleft\hspace{0pt}}p{#1}}%
+
+
+%----------------------------------------------------------------------------------------
+%	GRAPHICS DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+
+%for header image
+\usepackage{graphicx}
+
+% use this for floating figures
+% \usepackage{wrapfig}
+% \usepackage{float}
+% \floatstyle{boxed} 
+% \restylefloat{figure}
+
+%for drawing graphics		
+\usepackage{tikz}				
+\usetikzlibrary{shapes, backgrounds,mindmap, trees}
+
+%----------------------------------------------------------------------------------------
+%	Color DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+\usepackage{transparent}
+\usepackage{color}
+
+% primary color
+\definecolor{maincol}{RGB}{ 45, 50, 90 }
+
+% accent color, secondary
+% \definecolor{accentcol}{RGB}{ 250, 150, 10 }
+
+% dark color
+\definecolor{darkcol}{RGB}{ 70, 70, 70 }
+
+% light color
+\definecolor{lightcol}{RGB}{245,245,245}
+
+
+% Package for links, must be the last package used
+\usepackage[hidelinks]{hyperref}
+
+% returns minipage width minus two times \fboxsep
+% to keep padding included in width calculations
+% can also be used for other boxes / environments
+\newcommand{\mpwidth}{\linewidth-\fboxsep-\fboxsep}
+	
+
+
+%============================================================================%
+%
+%	CV COMMANDS
+%
+%============================================================================%
+
+%----------------------------------------------------------------------------------------
+%	 CV LIST
+%----------------------------------------------------------------------------------------
+
+% renders a standard latex list but abstracts away the environment definition (begin/end)
+\newcommand{\cvlist}[1] {
+	\begin{itemize}{#1}\end{itemize}
+}
+
+%----------------------------------------------------------------------------------------
+%	 CV TEXT
+%----------------------------------------------------------------------------------------
+
+% base class to wrap any text based stuff here. Renders like a paragraph.
+% Allows complex commands to be passed, too.
+% param 1: *any
+\newcommand{\cvtext}[1] {
+	\begin{tabular*}{1\mpwidth}{p{0.98\mpwidth}}
+		\parbox{1\mpwidth}{#1}
+	\end{tabular*}
+}
+
+%----------------------------------------------------------------------------------------
+%	CV SECTION
+%----------------------------------------------------------------------------------------
+
+% Renders a a CV section headline with a nice underline in main color.
+% param 1: section title
+\newcommand{\cvsection}[1] {
+	\vspace{14pt}
+	\cvtext{
+		\textbf{\LARGE{\textcolor{darkcol}{\uppercase{#1}}}}\\[-4pt]
+		\textcolor{maincol}{ \rule{0.1\textwidth}{2pt} } \\
+	}
+}
+
+%----------------------------------------------------------------------------------------
+%	META SKILL
+%----------------------------------------------------------------------------------------
+
+% Renders a progress-bar to indicate a certain skill in percent.
+% param 1: name of the skill / tech / etc.
+% param 2: level (for example in years)
+% param 3: percent, values range from 0 to 1
+\newcommand{\cvskill}[3] {
+	\begin{tabular*}{1\mpwidth}{p{0.72\mpwidth}  r}
+ 		\textcolor{black}{\textbf{#1}} & \textcolor{maincol}{#2}\\
+	\end{tabular*}%
+	
+	\hspace{4pt}
+	\begin{tikzpicture}[scale=1,rounded corners=2pt,very thin]
+		\fill [lightcol] (0,0) rectangle (1\mpwidth, 0.15);
+		\fill [maincol] (0,0) rectangle (#3\mpwidth, 0.15);
+  	\end{tikzpicture}%
+}
+
+
+%----------------------------------------------------------------------------------------
+%	 CV EVENT
+%----------------------------------------------------------------------------------------
+
+% Renders a table and a paragraph (cvtext) wrapped in a parbox (to ensure minimum content
+% is glued together when a pagebreak appears).
+% Additional Information can be passed in text or list form (or other environments).
+% the work you did
+% param 1: time-frame i.e. Sep 14 - Jan 15 etc.
+% param 2:	 event name (job position etc.)
+% param 3: Customer, Employer, Industry
+% param 4: Short description
+% param 5: work done (optional)
+% param 6: technologies include (optional)
+% param 7: achievements (optional)
+\newcommand{\cvevent}[7] {
+	
+	% we wrap this part in a parbox, so title and description are not separated on a pagebreak
+	% if you need more control on page breaks, remove the parbox
+	\parbox{\mpwidth}{
+		\begin{tabular*}{1\mpwidth}{p{0.72\mpwidth}  r}
+	 		\textcolor{black}{\textbf{#2}} & \colorbox{maincol}{\makebox[0.25\mpwidth]{\textcolor{white}{#1}}} \\
+			\textcolor{maincol}{\textbf{#3}} & \\
+		\end{tabular*}\\[4pt]
+	
+		\ifthenelse{\isempty{#4}}{}{
+			\cvtext{#4}\\
+		}
+	}
+
+	\ifthenelse{\isempty{#5}}{}{
+		\vspace{4pt}
+		{#5}
+	}
+	\vspace{4pt}
+}
+
+%----------------------------------------------------------------------------------------
+%	 CV META EVENT
+%----------------------------------------------------------------------------------------
+
+% Renders a CV event on the sidebar
+% param 1: title
+% param 2: subtitle (optional)
+% param 3: customer, employer, etc,. (optional)
+% param 4: info text (optional)
+\newcommand{\cvmetaevent}[4] {
+	\textcolor{maincol} {\cvtext{\textbf{\begin{flushleft}#1\end{flushleft}}}}
+
+	\ifthenelse{\isempty{#2}}{}{
+	\textcolor{darkcol} {\cvtext{\textbf{#2}} }
+	}
+
+	\ifthenelse{\isempty{#3}}{}{
+		\cvtext{{ \textcolor{darkcol} {#3} }}\\
+	}
+
+	\cvtext{#4}\\[14pt]
+}
+
+%---------------------------------------------------------------------------------------
+%	QR CODE
+%----------------------------------------------------------------------------------------
+
+% Renders a qrcode image (centered, relative to the parentwidth)
+% param 1: percent width, from 0 to 1
+\newcommand{\cvqrcode}[1] {
+	\begin{center}
+		\includegraphics[width={#1}\mpwidth]{qrcode}
+	\end{center}
+}
+
+%=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+%,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                       % EDIT AFTER THIS POINT
+%''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+%=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+
+
+%============================================================================%
+%
+%
+%
+%	DOCUMENT CONTENT
+%
+%
+%
+%============================================================================%
+\begin{document}
+\columnratio{0.31}
+\setlength{\columnsep}{2.2em}
+\setlength{\columnseprule}{4pt}
+\colseprulecolor{lightcol}
+\begin{paracol}{2}
+\begin{leftcolumn}
+%---------------------------------------------------------------------------------------
+%	META IMAGE
+%----------------------------------------------------------------------------------------
+%\includegraphics[width=\linewidth]{untitled.jpg}	%trimming relative to image size
+
+
+\vfill\null
+\cvsection{CONTACT, LINKS}
+	
+\iconemail{EnvelopeSquare}{14}{tonychen9321@gmail.com}{tony9321}{black}\\[6pt]
+\icontext{Github}{14}{\href{https://tony9321.github.io/Tony-s-Personal-Portfolio/#}{Personal Portfolio Website}}{black}\\[6pt]
+\icontext{Github}{14}{\href{https://github.com/tony9321}{tony9321}}{black}\\[6pt]
+\icontext{Google}{14}{\href{https://drive.google.com/drive/folders/11WXV8GeiAERXIHyxaaIVqyr3HdaiGaeh}{Awards on Google drive}}{black}\\[6pt]
+%\icontext{Linkedin}{14}{\href{https://www.linkedin.com/in/yourid/}{yourid}}{black}\\[6pt]
+\icontext{Phone}{14}{+886 955 850 931 (Taiwan)}{black}\\[6pt]
+\vfill\null
+%\cvqrcode{0.7}
+
+%---------------------------------------------------------------------------------------
+%	META SKILLS
+%----------------------------------------------------------------------------------------
+\cvsection{SKILLS}
+
+%\cvskill{Skill_Name} {Years of experience} {percentage of bar fill} \\[-2pt]
+
+\cvskill{C++} {4+ yrs} {1} \\[-2pt]
+
+\cvskill{C} {4+ yrs} {0.9} \\[-2pt]
+
+\cvskill{Python} {4+ yrs} {0.4} \\[-2pt]
+
+\cvskill{Java} {2+ yrs} {0.2} \\[-2pt]
+
+\cvskill{Solidity} {1+ yrs} {0.5} \\[-2pt]
+
+\cvskill{Block Chain Development} {1+ yrs} {0.6} \\[-2pt]
+
+\cvskill{Algorithms And Data Structures} {4+ yrs} {1} \\[-2pt]
+
+\cvskill{Linux} {1+ yrs} {0.3} \\[-2pt]
+
+\cvskill{Web Development} {1+ yrs} {0.3} \\[-2pt]
+
+\cvskill{Java Script} {1+ yrs} {0.3} \\[-2pt]
+
+\cvskill{MySql} {1+ yrs} {0.2} \\[-2pt]
+
+%\vfill\null
+%\cvqrcode{0.7}
+
+%---------------------------------------------------------------------------------------
+%	ACHIEVEMENTS
+%----------------------------------------------------------------------------------------
+\newpage
+\cvsection{ACHIEVEMENTS}
+
+\cvmetaevent
+{K-12 Education Administration of Taiwan took mine Project as an example for students to learn about the revolution of the education system.}
+{They took the Swipe For Study Buddies project as an example.}
+{}
+{K-12 Education Administration of Taiwan is making new policy for students to learn knowledge by ourselves outside the textbook.}
+
+\cvmetaevent
+{Speaker of Accomdemy}
+{Speaker of Accomdemy about intro of competitive programming}
+{}
+{Accomdemy is a self-learning organization spontaneously formed by a group of partners from the science and technology circle, the new innovation circle, and the education circle.}
+
+\cvmetaevent
+{Amazon STEM Educate Summer Camp Certificate}
+{AWS (Amazon Web Service)}
+{}
+{A camp held by AWS in Taiwan to learn about cloud services.}
+
+\cvmetaevent
+{Got enrolled in the STEM system in my exchange year.}
+{I took calculus in my sophomore year which is a STEM class.}
+{}
+{Science, technology, engineering, and mathematics (STEM) is a broad term used to group together these academic disciplines. .}
+
+\end{leftcolumn}
+\begin{rightcolumn}
+%---------------------------------------------------------------------------------------
+%	TITLE  HEADER
+%----------------------------------------------------------------------------------------
+\fcolorbox{white}{darkcol}{\begin{minipage}[c][3.5cm][c]{1\mpwidth}
+	\begin {center}
+		\HUGE{ \textbf{ \textcolor{white}{ \uppercase{ YUN-TUNG CHEN (TONY) CHEN } } } } \\[-24pt]
+		\textcolor{white}{ \rule{0.1\textwidth}{1.25pt} } \\[4pt]
+		\large{ \textcolor{white} {Current Bachelor Student - Computer Science \& Engineering } }
+	\end {center}
+\end{minipage}} \\[14pt]
+\vspace{-12pt}
+
+%---------------------------------------------------------------------------------------
+%	EDUCATION
+%----------------------------------------------------------------------------------------
+%\vfill\null
+\cvsection{EDUCATION}
+
+\cvevent
+	{\textbf{2022 - ongoing}}
+	{Freshman of computer and engineering science, Green River College}
+	{Green River College, Seattle (WA)}
+	{Current Status: Freshman.}
+\vfill\null
+
+\cvevent
+    {\textbf{2021 - 2022}}
+    {Homeschooling and audit in National Lo-Tung Senior High School}
+    {Yilan county,  Taiwan}
+    {Self Study and home schooling in cooperation with this school, majoring in computer science and math}
+\vfill\null
+
+\cvevent
+    {\textbf{2020 - 2021}}
+    {National Lo-Tung Senior High School}
+    {Yilan county,  Taiwan}
+    {The only year I studied in Taiwan's high school and I put lots of efforts in CS and math this year.}
+\vfill\null
+
+\cvevent
+	{\textbf{2019 - 2020}}
+	{Elko High School Exchange Program}
+	{Elko High School,  (NV)}
+	{Was an exchange student as a high school sophomore and got enrolled in STEM system and got a GPA of  \textbf{3.727}.(Unweighted)}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	WORK EXPERIENCE
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{WORK AND VOLUNTEERING EXPERIENCE}
+
+\cvevent
+	{\textbf{Dec 21 - Mar 22}}
+	{English Tutor}
+	{Online Tutoring}
+	{Online English tutor from high school students to adults exam preparations.
+\begin{description}[font=$\bullet$~\normalfont\scshape\color{red!50!black}]
+\item [College students] speaking and reading class
+\item [Adult] Toefl Listening and Reading exam preparations 
+\item [Adult] Toefl writing preparations
+\item [High school student] Reading class
+\end{description}}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{May 22 - Aug 22}}
+	{Programming Tutor}
+	{Online Tutoring}
+	{Tutoring front end engineers who wants to land a better software job algorithms and data structure.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Jul 31 - Aug 1}}
+	{Video Editing Voluteer}
+	{Conference for Open Source Coders (COSCUP)}
+	{COSCUP is Annual conference held by Taiwanese Open source community and I volunteered to edit video clips for different agendas.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Aug 10 - Now}}
+	{Coder and contributor of Civicue (Volunteer)}
+	{Civicue}
+	{Civicue is an open source democratic technology platform for citizens to vote for their opinions on block chain and I code and participate in for them.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{May 21 -  Now}}
+	{Technical Supporter of a local pharmacy}
+	{System maintenance and technical issue supporter}
+	{A local pharmacy in my town. (Yilan, Taiwan) I helped them with some technical issue troubleshooting, also making a small storage management system them.}
+	{}
+\vfill\null
+
+\cvevent
+    {\textbf{Aug 10 - Dec 12}}
+	{Social Distancing APP translator (Volunteer)}
+	{g0v}
+	{The g0v movement, or g0v is an open source, open government collaboration started in late 2012 in Taiwan. Originally driven by a bimonthly hackathon, I volunteered to translate for some open source projects like Social Distancing APP.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Jul 2020 2021}}
+	{Volunteered to clean the beach (community service)}
+	{Volunteer for the community to clean the beach}
+	{Some of the shores in my home town are covered by trash so I joined an movement and help cleaning the beach.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{May 2018}}
+	{Volunteered to play with elders (community service)}
+	{Volunteer to help the elders who are not able to move and chat with them.}
+	{Helping elders and chat with them to make them feel happier.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Apr 2017}}
+	{Volunteered to play with Kids who have disabilities (community service)}
+	{Volunteer to help kids who have disabilities.}
+	{There is a school in my home town that provides better resources and facilities for disabled kids, I joined the community to help them.}
+	{}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	COMPETITIONS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{COMPETITIONS}
+
+\cvevent
+	{\textbf{2021}}
+	{g0v (An well known open source organization in Taiwan) Hakathon Award and Grant}
+	{The g0v movement, or g0v, is an open source, open government collaboration started in late 2012 in Taiwan.}
+	{I am the founder of project Swipe for study buddies. We competed in Hakathon held by g0v and fortunately got awarded, interviewed and grand as a winning team.}
+\vfill\null
+
+\cvevent
+	{\textbf{2021}}
+	{Taipei City Government Data Application Hakathon award}
+	{Taipei City Government is the capital city of Taiwan.}
+	{Taipei City Government let us use the open source data in our Hakathon project to help them improve the city and we use the data from the education category, we got awarded and made it to the final.}
+\vfill\null
+
+\cvevent
+	{\textbf{2021}}
+	{ISSC (International School Software Competition)}
+	{Got the rank of 17th place in Taiwan in this contest in 2021}
+	{I competed with other two teammates in this contest too and the descriptions of the questions are in English in this contest.}
+\vfill\null
+
+\cvevent
+	{\textbf{2021}}
+	{Codeforces Competitive Programming Contests {\href{https://codeforces.com/profile/tonychen9321}{(link to my status)}}}
+	{Participated in lots of different contests on the Codeforces platform nearly two or three days once a week before and last for about a year.}
+	{Codeforces is a website that hosts competitive programming contests. It is maintained by a group of competitive programmers from ITMO University.}
+\vfill\null
+
+\cvevent
+	{\textbf{2021}}
+	{Atcoder Competitive Programming Contests {\href{https://atcoder.jp/users/tony9321}{(link to my status)}}}
+	{Participated in lots of different contests on the Atcoder platform nearly two or three days once a week before and last for about a year.}
+	{AtCoder is a programming contest site from Japan for anyone from beginners to experts. They hold weekly programming contests online.}
+\vfill\null
+
+\cvevent
+	{\textbf{2021}}
+	{Young Turing Program}
+	{Me and two teammates competed in the first round of this competitive programming competition of Taiwan.}
+	{One of the National competitive programming contest for
+teenagers.}
+\vfill\null
+
+\cvevent
+	{\textbf{2019-20}}
+	{Mu Alpha Theta math league contests}
+	{Competed for Elko High school in the math competitions league weekly for a year.}
+	{Mu Alpha Theta is the United
+States mathematics honor soci-
+ety for high school and two-year
+college students.}
+\vfill\null
+
+\cvevent
+	{\textbf{2021}}
+	{AMC (American Mathematics Competitions) 10, 12}
+	{Competed in AMC 10 and 12 several times.}
+	{The American Mathematics Competitions (AMC) are the first of a series of competitions in secondary school mathematics that determine the United States team for the International Mathematical Olympiad (IMO).}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	PROJECTS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{PROJECTS}
+
+\cvevent
+	{\textbf{2021}}
+	{Swipe For Study Buddies-Pintwo({\href{https://drive.google.com/drive/folders/11WXV8GeiAERXIHyxaaIVqyr3HdaiGaeh}{Awarded, funded (link)}} and made on a {\href{https://sdgs.udn.com/sdgs/story/12425/6110605/in/news/}{news (link)}})}
+	{Tool: Python, MySQL, JS, react, json, mongdb, phpmyadmin}
+	{I am the founder of this open source project which is to help people find their study mates more easily. This service is developed by me and the team I recruited, we competed in several hakathons held by g0v(Open source organization) and Taipei City government(Capital of Taiwan) with good results and was made on an online news, also got a grant of 667 dollars.}
+\vfill\null
+
+\cvevent
+	{\textbf{2022}}
+	{Ethereum Smart Contract and python deployment}
+	{Tool: Solidity, Brownies, python, remix, metamask, truffle}
+	{A project I learned to code an Ethereum smart contract and deployed with python, metamask and be more familiar with the concept of block chain.}
+\vfill\null
+
+
+\cvevent
+	{\textbf{2022}}
+	{Ethereum Smart Contract and Web3 website}
+	{Tool: Solidity, Hardhat, JS, react, remix, metamask}
+	{A project I learned to code an Ethereum smart contract and deployed with JS, a web3 website, metamask and be more familiar with the concept of block chain.}
+\vfill\null
+
+\cvevent
+	{\textbf{2022}}
+	{Web Scrapper to get information from the TimesJobs website}
+	{Tool: python}
+	{A project I learned to code a web scrapper and learned to get the information I want from a website also putting those raw information into formatted files.}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	LEADERSHIPS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{LEADERSHIPS}
+
+\cvevent
+	{\textbf{2020-NOW}}
+	{Founder and Leader of Swipe For Study Buddies-Pintwo}
+	{Team management of the small organization I created.}
+	{This team was created without any intentions to make profit, all of our code snippets are open source to anyone.}
+\vfill\null
+
+\cvevent
+	{\textbf{2013-2022}}
+	{Class Leader of when I was in Elementary school, middle school.}
+	{Helping the class to learn and run more effectively, helping classmates to cooperate and manipulate the resources.}
+	{}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	WORKSHOPS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{WORKSHOPS \& CONFERENCES}
+
+\cvevent
+	{\textbf{Sep 2021,Aug 2022}}
+	{SITCON  (Students’ Information Technology Conference)}
+	{SITCON Started from 2013,  formed by students, putting efforts in IT education and open source projects.}
+	{Annual conference participant and contributor.}
+\vfill\null
+
+\cvevent
+	{\textbf{Jul 2021, Aug 2022}}
+	{Coscup (Conference for Open Source Coders)}
+	{Conference for Open Source Coders, Users and Promoters is an annual conference held by Taiwanese Open source community participants since 2006.}
+	{Annual conference participant and contributor.}
+\vfill\null
+
+\cvevent
+	{\textbf{Aug 2021,22}}
+	{Hitcon (Hackers in Taiwan Conference)}
+	{Hacks in Taiwan (HITCON) is a highly technical security conference in Taiwan to gather the various information security researchers and their expertise, the first of its kind in Taiwan.}
+	{Annual conference participant.}
+\vfill\null
+
+\cvevent
+	{\textbf{Aug 2021,22}}
+	{Pycon (Python Conference)}
+	{The Python Conference (also called PyCon) is the largest annual convention for the discussion and promotion of the Python programming language.}
+	{Annual conference participant.}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	Scores
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{SCORES}
+
+\cvevent
+	{\textbf{2020-2022}}
+	{SAT, AP Exams, TOEFL}
+	{All of the exams below are what I Self study and the only attempt}
+	{The year I chose to homeschooling and audit only few classes at the local high school, I self study and prepared for these exams because public high school in Taiwan does not provide all those courses.
+\begin{description}[font=$\bullet$~\normalfont\scshape\color{red!50!black}]
+\item [SAT] 1330 out of 1600 (PR 93) This is my first and only attempt.
+The SAT is a standardized test
+widely used for college admis-
+sions in the United States
+\item [AP Calculus BC, Physics2, Computer Science A] Got scores of 4 out of 5 on all three tests by self taught and
+got AP Scholar Reward given
+by the the College Board. AP exams are
+hold by college board for high
+school students
+\item [TOEFL] 87 out of 120 on my first and only attempt.
+TOEFL is a test of English as a Foreign Lan-
+guage is a standardized test to
+measure the English language
+ability of non-native speakers
+wishing to enroll in English-
+speaking universities.
+\end{description}}
+	{}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	SKILLS
+%----------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------
+%	PERSONAL DETAILS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{EXTRACURRICULAR}
+\vspace{-0.3cm}
+\begin{itemize}
+  \item First place in \textbf{Scratch, Arduino} application contest.
+  \item First place in \textbf{table tennis} contest in my county(Yilan, Taiwan) multiple times and titles for 5 years.
+  \item Volunteered in teach my high school classmates \textbf{math and programming}.
+  \item \textbf{Basketball manager} of Elko High School.
+  \item\textbf{Swimming Team and Water polo player}.  
+  \item\textbf{Open Source project} contributor.
+  \item Codeforces \textbf{Algorithms and data structure} contestant.
+  \item Atcoder \textbf{Algorithms and data structure} contestant.
+  \item Member of  \textbf{robotics club}. 
+  \item \textbf{CPR certificate}.
+  \item  Break dance club member in high school.
+  \item Youtube channel making videos of  \textbf{cryto currency news and technology, math behind it} also cube tutorials.
+  \item Trading experience in \textbf{crypto currencies} and web3 gamefi for a year and familiar with \textbf{quant zone trading, margin trading}. 
+\end{itemize}
+\vfill\null
+
+
+% hotfixes to create fake-space to ensure the whole height is used
+\vfill
+\vfill
+\vfill
+\end{rightcolumn}
+\end{paracol}
+\end{document}
+
+
+
